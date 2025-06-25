@@ -1,4 +1,4 @@
-package com.minis;
+package com.minis.core;
 
 public class BeanDefinition {
 
