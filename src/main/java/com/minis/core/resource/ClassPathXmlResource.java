@@ -1,4 +1,4 @@
-package com.minis.core;
+package com.minis.core.resource;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
