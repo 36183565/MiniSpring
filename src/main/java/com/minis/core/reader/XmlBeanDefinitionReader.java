@@ -1,6 +1,6 @@
 package com.minis.core.reader;
 
-import com.minis.core.BeanDefinition;
+import com.minis.beans.BeanDefinition;
 import com.minis.core.factory.SimpleBeanFactory;
 import com.minis.core.resource.Resource;
 import org.dom4j.Element;

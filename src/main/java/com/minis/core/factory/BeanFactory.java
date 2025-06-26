@@ -6,7 +6,11 @@ public interface BeanFactory {
 
     Object getBean(String name) throws BeansException;
 
-    void registerBean(String name, Object obj);
-
     Boolean containsBean(String name);
+
+    boolean isSingleton(String name);
+
+    boolean isPrototype(String name);
+
+    Class<?> getType(String name);
 }

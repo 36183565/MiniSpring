@@ -1,22 +1,28 @@
 package com.minis.core.factory;
 
-import com.minis.core.BeanDefinition;
+import com.minis.beans.BeanDefinition;
 import com.minis.core.exception.BeansException;
+import com.minis.core.registry.BeanDefinitionRegistry;
 
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class SimpleBeanFactory extends DefaultSingletonBeanRegistry implements BeanFactory {
+public class SimpleBeanFactory extends DefaultSingletonBeanRegistry
+        implements BeanFactory, BeanDefinitionRegistry {
 
-    private Map<String, BeanDefinition> beanDefinitions = new ConcurrentHashMap<>();
+    private Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<>();
+
+    private List<String> beanDefinitionNames = new ArrayList<>();
 
     public SimpleBeanFactory() {}
     @Override
     public Object getBean(String name) throws BeansException {
         Object singleton = this.getSingleton(name);
         if (singleton == null) {
-            BeanDefinition beanDefinition = beanDefinitions.get(name);
+            BeanDefinition beanDefinition = beanDefinitionMap.get(name);
             if (beanDefinition == null) {
                 return new BeansException();
             }
@@ -33,16 +39,51 @@ public class SimpleBeanFactory extends DefaultSingletonBeanRegistry implements B
     }
 
     @Override
-    public void registerBean(String name, Object obj) {
-        this.registerSingleton(name, obj);
+    public Boolean containsBean(String name) {
+        return containsSingleton(name);
     }
 
     @Override
-    public Boolean containsBean(String name) {
-        return this.containsSingleton(name);
+    public boolean isSingleton(String name) {
+        return beanDefinitionMap.get(name).isSingleton();
+    }
+
+    @Override
+    public boolean isPrototype(String name) {
+        return beanDefinitionMap.get(name).isPrototype();
+    }
+
+    @Override
+    public Class<?> getType(String name) {
+        return beanDefinitionMap.get(name).getClass();
     }
 
     public void registerBeanDefinition(String name, BeanDefinition beanDefinition) {
-        this.beanDefinitions.put(name, beanDefinition);
+        this.beanDefinitionMap.put(name, beanDefinition);
+        this.beanDefinitionNames.add(name);
+        if (!beanDefinition.isLazyInit()) {
+            try {
+                getBean(name);
+            } catch (BeansException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public BeanDefinition getBeanDefinition(String beanName) {
+        return this.beanDefinitionMap.get(beanName);
+    }
+
+    @Override
+    public void removeBeanDefinition(String beanName) {
+        this.beanDefinitionMap.remove(beanName);
+        this.beanDefinitionNames.remove(beanName);
+        this.removeSingleton(beanName);
+    }
+
+    @Override
+    public boolean containsBeanDefinition(String beanName) {
+        return this.beanDefinitionMap.containsKey(beanName);
     }
 }
